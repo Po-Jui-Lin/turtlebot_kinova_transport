@@ -3,9 +3,9 @@
 <package format="3">
   <name>turtlebot_kinova_transport</name>
   <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="pojuilin@todo.todo">pojuilin</maintainer>
-  <license>TODO: License declaration</license>
+  <description>Integration of Kinova Gen3 Lite arm with TurtleBot for pick and place tasks</description>
+  <maintainer email="pojuilin@uw.edu">pojuilin</maintainer>
+  <license>Apache-2.0</license>
 
   <depend>rclpy</depend>
   <depend>geometry_msgs</depend>
