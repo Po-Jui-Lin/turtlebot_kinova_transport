@@ -2,7 +2,7 @@
 import rclpy
 from rclpy.node import Node
 from geometry_msgs.msg import Pose, Point, Quaternion, Twist
-from pick_place_lab.gen3lite_pymoveit2 import Gen3LiteArm, Gen3LiteGripper
+from turtlebot_kinova_transport.gen3lite_pymoveit2 import Gen3LiteArm, Gen3LiteGripper
 import time
 import csv
 import threading
@@ -176,7 +176,7 @@ def main():
     rclpy.init()
     
     # Get the package path for the CSV file
-    csv_path = "/home/pojuilin@netid.washington.edu/ros2_ws/src/pick_place_lab/pick_place_lab/data_final_deo2.csv"
+    csv_path = "/home/pojuilin@netid.washington.edu/ros2_ws/src/pick_place_lab/pick_place_lab/data_final_demo.csv"
     
     # Print information about the task
     print("\n======= Kinova-TurtleBot Pick and Place Task =======")
