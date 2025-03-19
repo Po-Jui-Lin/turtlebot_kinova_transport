@@ -44,7 +44,7 @@ def generate_launch_description():
         event_handler=OnProcessExit(
             target_action=kinova_bringup,
             on_exit=[
-                LogInfo(msg="Kinova arm is ready. Starting integrated pick and place task..."),
+                LogInfo(msg="Kinova arm is ready. Starting task..."),
                 integrated_node
             ]
         )
