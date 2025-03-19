@@ -9,6 +9,12 @@ import threading
 import sys
 import os
 
+from ament_index_python.packages import get_package_share_directory
+
+# Get the package path for the CSV file
+package_share_dir = get_package_share_directory('turtlebot_kinova_transport')
+csv_path = os.path.join(package_share_dir, 'data', 'data_final_demo.csv')
+
 class TurtleBotController(Node):
     """
     Controller for the TurtleBot to handle open-loop navigation.
@@ -174,9 +180,6 @@ def main():
     """
     # Initialize ROS
     rclpy.init()
-    
-    # Get the package path for the CSV file
-    csv_path = "/home/pojuilin@netid.washington.edu/ros2_ws/src/pick_place_lab/pick_place_lab/data_final_demo.csv"
     
     # Print information about the task
     print("\n======= Kinova-TurtleBot Pick and Place Task =======")

@@ -31,28 +31,3 @@ setup(
     },
 )
 
-    name=package_name,
-    version='0.1.0',  # Updated version number
-    packages=find_packages(exclude=['test']),
-    data_files=[
-        ('share/ament_index/resource_index/packages',
-            ['resource/' + package_name]),
-        ('share/' + package_name, ['package.xml']),
-        # Add launch files
-        (os.path.join('share', package_name, 'launch'), glob('launch/*.launch.py')),
-        # Add CSV data files
-        (os.path.join('share', package_name, 'data'), glob('data/*.csv')),
-    ],
-    install_requires=['setuptools'],
-    zip_safe=True,
-    maintainer='Po-Jui Lin',  # Updated maintainer
-    maintainer_email='pojuilin@uw.edu',  # Updated email
-    description='Integration of Kinova Gen3 Lite arm with TurtleBot for pick and place tasks',  # Added description
-    license='MIT',  # Updated license
-    tests_require=['pytest'],
-    entry_points={
-        'console_scripts': [
-            'integrated_pick_place = turtlebot_kinova_transport.integrated_pick_place:main',  # Added entry point
-        ],
-    },
-)
