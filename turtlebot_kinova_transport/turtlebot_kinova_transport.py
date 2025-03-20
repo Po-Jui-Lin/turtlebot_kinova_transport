@@ -140,26 +140,28 @@ def move(arm, pose=None, delay=1):
 
 def perform_pick_and_place_sequence(arm, gripper, positions):
     """
-    Perform a complete pick-and-place sequence using all positions from the CSV.
-    Always assumes all 5 points are present in the CSV.
-    Releases the cube only at the last point (retreat_position).
+    Perform a complete pick-and-place sequence following the exact order of positions from the CSV.
+    Releases the cube only at the retreat_position (the last position in sequence).
+    
+    The sequence followed is:
+    1. pick_position
+    2. mid_position
+    3. place_position
+    4. approach_position
+    5. retreat_position
     
     Args:
         arm: The robot arm controller
         gripper: The gripper controller
         positions: Dictionary of named positions from the CSV
     """
-
+    # Verify we have all required positions
     required_positions = ["pick_position", "mid_position", "place_position", "approach_position", "retreat_position"]
     for pos in required_positions:
         if pos not in positions:
             print(f"Error: Required position '{pos}' not found in CSV data")
             print(f"Available positions: {list(positions.keys())}")
             return
-    
-    # Move to approach position
-    print("Moving to approach position")
-    move(arm, positions["approach_position"], 2)
     
     # Move to pick position
     print("Moving to pick position")
@@ -170,13 +172,17 @@ def perform_pick_and_place_sequence(arm, gripper, positions):
     gripper.move_to_position(0.65)
     time.sleep(1.0)
     
-    # Move to mid position for obstacle avoidance
+    # Move to mid position
     print("Moving to mid position")
     move(arm, positions["mid_position"], 2)
     
-    # Move to place position (but don't release the object yet)
+    # Move to place position
     print("Moving to place position")
     move(arm, positions["place_position"], 2)
+    
+    # Move to approach position
+    print("Moving to approach position")
+    move(arm, positions["approach_position"], 2)
     
     # Move to retreat position
     print("Moving to retreat position")
