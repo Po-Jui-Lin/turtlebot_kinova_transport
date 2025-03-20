@@ -8,6 +8,7 @@ import csv
 import threading
 import sys
 import os
+import argparse  # Added for command-line arguments
 
 from ament_index_python.packages import get_package_share_directory
 
@@ -174,14 +175,67 @@ def perform_pick_and_place_sequence(arm, gripper, positions):
         print("Moving to retreat position")
         move(arm, positions["retreat_position"], 2)
 
-def main():
-    """
-    Main function to initialize the ROS node, control the turtlebot and arm for pick-and-place.
-    """
-    # Initialize ROS
-    rclpy.init()
+def test_turtlebot_movement():
+    """Test TurtleBot movement forward and backward."""
+    print("\n=== Testing TurtleBot Movement ===")
     
-    # Print information about the task
+    turtlebot = TurtleBotController()
+    
+    try:
+        # Test forward movement (0.5 meters)
+        print("\nTesting forward movement (0.5 meters)...")
+        turtlebot.move_linear(0.5, speed=0.2)
+        time.sleep(2.0)  # Wait between movements
+        
+        # Test backward movement (0.5 meters)
+        print("\nTesting backward movement (0.5 meters)...")
+        turtlebot.move_linear(-0.5, speed=0.2)
+        
+        print("\nTurtleBot movement test completed successfully")
+    except Exception as e:
+        print(f"Error during TurtleBot testing: {e}")
+
+def test_arm_pick_place():
+    """Test Kinova arm pick and place functionality."""
+    print("\n=== Testing Kinova Arm Pick and Place ===")
+    
+    arm = None
+    gripper = None
+    
+    try:
+        arm = Gen3LiteArm()
+        gripper = Gen3LiteGripper()
+        
+        # Move arm to a safe vertical/home position
+        print("Moving arm to home position")
+        arm.go_vertical()
+        gripper.move_to_position(0.0)
+        time.sleep(1.0)
+        
+        # Load poses from the CSV file
+        print(f"Loading poses from {csv_path}")
+        poses = load_poses_from_csv(csv_path)
+        
+        # Execute pick-and-place sequence
+        print("Executing pick and place sequence")
+        perform_pick_and_place_sequence(arm, gripper, poses)
+        
+        # Return to home position
+        print("Moving arm back to home position")
+        arm.go_vertical()
+        
+        print("\nKinova arm pick and place test completed successfully")
+    except Exception as e:
+        print(f"Error during Kinova arm testing: {e}")
+    finally:
+        # Shutdown procedures
+        if gripper:
+            gripper.shutdown()
+        if arm:
+            arm.shutdown()
+
+def full_task():
+    """Execute the full task with both TurtleBot and Kinova arm."""
     print("\n======= Kinova-TurtleBot Pick and Place Task =======")
     print("1. TurtleBot will move forward 3.16 meters")
     print("2. Kinova arm will pick up an object and place it in the basket")
@@ -231,7 +285,6 @@ def main():
         arm.go_vertical()
         
         print("\n--- Task Completed Successfully ---")
-        
     except Exception as e:
         print(f"Error during execution: {e}")
         import traceback
@@ -243,6 +296,32 @@ def main():
             gripper.shutdown()
         if arm:
             arm.shutdown()
+
+def main():
+    """
+    Main function with command-line argument support for testing components separately.
+    """
+    # Set up argument parser
+    parser = argparse.ArgumentParser(description='TurtleBot-Kinova Integration with Component Testing')
+    parser.add_argument('--test', choices=['turtlebot', 'arm', 'full'], default='full',
+                        help='Test specific component: turtlebot, arm, or full task (default)')
+    
+    # Parse arguments
+    args = parser.parse_args()
+    
+    # Initialize ROS
+    rclpy.init()
+    
+    try:
+        # Run the selected test mode
+        if args.test == 'turtlebot':
+            test_turtlebot_movement()
+        elif args.test == 'arm':
+            test_arm_pick_place()
+        else:  # 'full' mode
+            full_task()
+    finally:
+        # Final shutdown
         rclpy.shutdown()
 
 if __name__ == "__main__":
