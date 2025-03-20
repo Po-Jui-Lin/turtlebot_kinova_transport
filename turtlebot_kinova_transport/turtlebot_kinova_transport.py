@@ -35,19 +35,31 @@ class TurtleBotController(Node):
         while rclpy.ok():
             rclpy.spin_once(self, timeout_sec=0.1)
     
-    def move_linear(self, distance, speed=0.2):
+    def move_linear(self, distance, speed=0.2, forward_correction=0.01, backward_correction=-0.01):
         """
         Move the turtlebot linearly by the specified distance in meters using open-loop control.
+        Includes angular correction for both directions to counter drift.
         
         Args:
             distance (float): Distance to move in meters (positive for forward, negative for backward)
             speed (float): Linear speed in m/s (always positive)
+            forward_correction (float): Angular velocity correction when moving forward (positive to turn left)
+            backward_correction (float): Angular velocity correction when moving backward (negative to turn right)
         """
         direction = 1 if distance > 0 else -1
         abs_distance = abs(distance)
         abs_speed = abs(speed)
         
-        self.get_logger().info(f'Moving {"forward" if direction > 0 else "backward"} {abs_distance} meters at {abs_speed} m/s')
+        # Apply the appropriate correction based on direction
+        if direction > 0:
+            angular_correction = forward_correction  # Moving forward, apply forward correction
+            direction_str = "forward"
+        else:
+            angular_correction = backward_correction  # Moving backward, apply backward correction
+            direction_str = "backward"
+        
+        self.get_logger().info(f'Moving {direction_str} {abs_distance} meters at {abs_speed} m/s')
+        self.get_logger().info(f'Using angular correction of {angular_correction} rad/s')
         
         # Calculate time needed to travel the distance at the given speed
         time_to_travel = abs_distance / abs_speed
@@ -55,7 +67,7 @@ class TurtleBotController(Node):
         # Create twist message
         twist = Twist()
         twist.linear.x = direction * abs_speed
-        twist.angular.z = 0.0
+        twist.angular.z = angular_correction  # Apply direction-specific correction
         
         # Record start time
         start_time = time.time()
@@ -68,7 +80,7 @@ class TurtleBotController(Node):
         # Stop the robot
         self._stop()
         self.get_logger().info('Stopped moving')
-    
+
     def _stop(self):
         """Stop the turtlebot by publishing zero velocity."""
         twist = Twist()
@@ -184,12 +196,12 @@ def test_turtlebot_movement():
     try:
         # Test forward movement (0.5 meters)
         print("\nTesting forward movement (0.5 meters)...")
-        turtlebot.move_linear(0.5, speed=0.2)
+        turtlebot.move_linear(3.4, speed=0.2)
         time.sleep(2.0)  # Wait between movements
         
         # Test backward movement (0.5 meters)
         print("\nTesting backward movement (0.5 meters)...")
-        turtlebot.move_linear(-0.5, speed=0.2)
+        turtlebot.move_linear(-3.3, speed=0.2)
         
         print("\nTurtleBot movement test completed successfully")
     except Exception as e:
