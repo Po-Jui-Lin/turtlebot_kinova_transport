@@ -35,7 +35,7 @@ class TurtleBotController(Node):
         while rclpy.ok():
             rclpy.spin_once(self, timeout_sec=0.1)
     
-    def move_linear(self, distance, speed=0.2, forward_correction=0.01, backward_correction=-0.01):
+    def move_linear(self, distance, speed=0.2, forward_correction=0.0094, backward_correction=-0.01):
         """
         Move the turtlebot linearly by the specified distance in meters using open-loop control.
         Includes angular correction for both directions to counter drift.
@@ -207,7 +207,7 @@ def test_turtlebot_movement():
         
         # Test backward movement (0.5 meters)
         print("\nTesting backward movement (0.5 meters)...")
-        turtlebot.move_linear(-3.3, speed=0.2)
+        turtlebot.move_linear(-3.2, speed=0.2)
         
         print("\nTurtleBot movement test completed successfully")
     except Exception as e:
@@ -284,7 +284,7 @@ def full_task():
         
         # Step 1: Move turtlebot forward 316 cm
         print("\n--- Step 1: Moving TurtleBot Forward ---")
-        turtlebot.move_linear(3.16, speed=0.2)
+        turtlebot.move_linear(3.2, speed=0.2, )
         time.sleep(2.0)  # Wait for turtlebot to settle
         
         # Step 2: Execute pick-and-place sequence with the arm
@@ -296,7 +296,7 @@ def full_task():
         
         # Step 3: Move turtlebot backward 316 cm to return to start
         print("\n--- Step 3: Returning TurtleBot to Start Position ---")
-        turtlebot.move_linear(-3.16, speed=0.2)
+        turtlebot.move_linear(-3.2, speed=0.2)
         
         # Move arm back to a safe vertical/home position
         print("Moving arm to home position")
