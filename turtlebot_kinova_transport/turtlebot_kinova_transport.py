@@ -141,24 +141,25 @@ def move(arm, pose=None, delay=1):
 def perform_pick_and_place_sequence(arm, gripper, positions):
     """
     Perform a complete pick-and-place sequence using all positions from the CSV.
+    Always assumes all 5 points are present in the CSV.
+    Releases the cube only at the last point (retreat_position).
     
     Args:
         arm: The robot arm controller
         gripper: The gripper controller
         positions: Dictionary of named positions from the CSV
     """
-    # Verify we have at least the minimum required positions
-    required_positions = ["pick_position", "mid_position", "place_position"]
+
+    required_positions = ["pick_position", "mid_position", "place_position", "approach_position", "retreat_position"]
     for pos in required_positions:
         if pos not in positions:
             print(f"Error: Required position '{pos}' not found in CSV data")
             print(f"Available positions: {list(positions.keys())}")
             return
     
-    # Move to approach position if available
-    if "approach_position" in positions:
-        print("Moving to approach position")
-        move(arm, positions["approach_position"], 2)
+    # Move to approach position
+    print("Moving to approach position")
+    move(arm, positions["approach_position"], 2)
     
     # Move to pick position
     print("Moving to pick position")
@@ -173,19 +174,18 @@ def perform_pick_and_place_sequence(arm, gripper, positions):
     print("Moving to mid position")
     move(arm, positions["mid_position"], 2)
     
-    # Move to place position
+    # Move to place position (but don't release the object yet)
     print("Moving to place position")
     move(arm, positions["place_position"], 2)
     
-    # Open gripper to release object
-    print("Opening gripper")
+    # Move to retreat position
+    print("Moving to retreat position")
+    move(arm, positions["retreat_position"], 2)
+    
+    # Open gripper to release object at the retreat position (the last position)
+    print("Opening gripper to release object at retreat position")
     gripper.move_to_position(0.0)
     time.sleep(1.0)
-    
-    # Move to retreat position if available
-    if "retreat_position" in positions:
-        print("Moving to retreat position")
-        move(arm, positions["retreat_position"], 2)
 
 def test_turtlebot_movement():
     """Test TurtleBot movement forward and backward."""
